@@ -1,0 +1,30 @@
+.widget {
+  height: 350px;
+  border: 1px solid #323232;
+  overflow-y: scroll;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 15px 0;
+  row-gap: 15px;
+}
+
+.widget_size_small {
+  width: 282px;
+}
+
+.widget_size_medium {
+  width: 450px;
+}
+
+.widget_size_large {
+  width: 700px;
+}
+
+.widget img {
+  max-width: 252px;
+}
+
+.widget p {
+  max-width: 252px;
+}

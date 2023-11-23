@@ -1,6 +1,11 @@
+import './App.css'
+import Widget from '../Widget/Widget'
+
 const App = () => {
   return (
-    <div>App</div>
+    <div className='app'>
+      <Widget></Widget>
+    </div>
   )
 }
 
