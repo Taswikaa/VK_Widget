@@ -17,7 +17,7 @@ const Widget = () => {
   const [offset, setOffset] = useState(0);
   // Всего постов в группе
   const [totalCount, setTotalCount] = useState(0);
-  const [isFetching, setIsFetching] = useState(true);
+  const [isFetching, setIsFetching] = useState(false);
 
   // ID нужной группы
   useEffect(() => {
@@ -25,11 +25,24 @@ const Widget = () => {
   }, [])
 
   useEffect(() => {
+    if (localStorage.getItem('cash')) {
+      setPosts(JSON.parse(localStorage.getItem('cash')));
+      setOffset(JSON.parse(localStorage.getItem('cash')).length);
+      setTotalCount(localStorage.getItem('totalCount'));
+    } else {
+      localStorage.setItem('cash', JSON.stringify([]));
+      setIsFetching(true);
+    }
+  }, [])
+
+  useEffect(() => {
     if (isFetching) {
       api.getPosts(offset)
       .then(res => {
         setTotalCount(res.response.count);
+        localStorage.setItem('totalCount', res.response.count)
         setPosts([...posts, ...res.response.items]);
+        localStorage.setItem('cash', JSON.stringify([...JSON.parse(localStorage.getItem('cash')), ...res.response.items]))
         setOffset(prev => prev + COUNT * 1);
       })
       .catch(err => console.log(err))
