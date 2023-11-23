@@ -11,10 +11,15 @@ import { COUNT, HEIGHT_DIFFERENCE, WIDGET_HEIGHT } from '../../api/constans'
 const Widget = () => {
   const widget = useRef(null)
 
+  // Текущие полученные посты
   const [posts, setPosts] = useState([]);
+  // Смещение пагинации
   const [offset, setOffset] = useState(0);
+  // Всего постов в группе
+  const [totalCount, setTotalCount] = useState(0);
   const [isFetching, setIsFetching] = useState(true);
 
+  // ID нужной группы
   useEffect(() => {
     api.getGroupId(101391911);
   }, [])
@@ -23,10 +28,9 @@ const Widget = () => {
     if (isFetching) {
       api.getPosts(offset)
       .then(res => {
-        if (res) {
-          setPosts([...posts, ...res.response.items]);
-          setOffset(prev => prev + COUNT * 1);
-        }
+        setTotalCount(res.response.count);
+        setPosts([...posts, ...res.response.items]);
+        setOffset(prev => prev + COUNT * 1);
       })
       .catch(err => console.log(err))
       .finally(() => setIsFetching(false));
@@ -35,7 +39,7 @@ const Widget = () => {
   }, [isFetching])
 
   function handleScroll() {
-    if (widget.current.scrollHeight - (widget.current.scrollTop + WIDGET_HEIGHT) < HEIGHT_DIFFERENCE) {
+    if (widget.current.scrollHeight - (widget.current.scrollTop + WIDGET_HEIGHT) < HEIGHT_DIFFERENCE && posts.length < totalCount) {
       setIsFetching(true);
     }
   }
