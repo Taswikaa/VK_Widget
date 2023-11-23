@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import './Widget.css'
 import { api } from '../../api/api'
 import likeImg from '../../img/like.svg'
@@ -6,29 +6,42 @@ import dateImg from '../../img/date.svg'
 import repostImg from '../../img/repost.svg'
 import viewImg from '../../img/view.svg'
 import { transformDate } from '../../utils/utils'
+import { COUNT, HEIGHT_DIFFERENCE, WIDGET_HEIGHT } from '../../api/constans'
 
 const Widget = () => {
+  const widget = useRef(null)
+
   const [posts, setPosts] = useState([]);
+  const [offset, setOffset] = useState(0);
+  const [isFetching, setIsFetching] = useState(true);
 
   useEffect(() => {
     api.getGroupId(101391911);
   }, [])
 
-  function handleScroll() {
-    // console.log(123);
-  }
+  useEffect(() => {
+    if (isFetching) {
+      api.getPosts(offset)
+      .then(res => {
+        if (res) {
+          setPosts([...posts, ...res.response.items]);
+          setOffset(prev => prev + COUNT * 1);
+        }
+      })
+      .catch(err => console.log(err))
+      .finally(() => setIsFetching(false));
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [isFetching])
 
-  function getData() {
-    api.getPosts(0)
-    .then(res => {
-      console.log(res.response);
-      setPosts(res.response.items);
-    })
-    .finally(() => console.log(posts))
+  function handleScroll() {
+    if (widget.current.scrollHeight - (widget.current.scrollTop + WIDGET_HEIGHT) < HEIGHT_DIFFERENCE) {
+      setIsFetching(true);
+    }
   }
 
   return (
-    <div className='widget widget_size_small' onScroll={handleScroll} onClick={getData}>
+    <div ref={widget} className='widget widget_size_small' onScroll={handleScroll}>
       {
         posts.length && posts.map(post => {
           return (
@@ -39,7 +52,7 @@ const Widget = () => {
                 </p>
               }
               {
-                post.attachments.length && post.attachments[0].photo ? <img src={post.attachments[0].photo.sizes[1].url} alt="" /> : null
+                post.attachments.length && post.attachments[0].photo ? <img src={post.attachments[0].photo.sizes[3].url} alt="" /> : null
               }
               <div className="post__advanced-data">
                 <div className="post__items-count">
