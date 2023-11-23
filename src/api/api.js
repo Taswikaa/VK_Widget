@@ -15,9 +15,9 @@ class Api {
   }
 
   getPosts(offset) {
-    fetchJsonp(`${this.baseUrl}&owner_id=-${this.id}&offset=${offset}`)
+    return fetchJsonp(`${this.baseUrl}&owner_id=-${this.id}&offset=${offset}`)
     .then(res => res.json())
-    .then(data => console.log(data.response))
+    .then(data => data)
     .catch(err => console.log(err))
   }
 }

@@ -1,43 +1,76 @@
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import './Widget.css'
 import { api } from '../../api/api'
+import likeImg from '../../img/like.svg'
+import dateImg from '../../img/date.svg'
+import repostImg from '../../img/repost.svg'
+import viewImg from '../../img/view.svg'
+import { transformDate } from '../../utils/utils'
 
 const Widget = () => {
+  const [posts, setPosts] = useState([]);
 
   useEffect(() => {
-    api.getGroupId(186103254);
+    api.getGroupId(101391911);
   }, [])
 
   function handleScroll() {
-    console.log(123);
+    // console.log(123);
   }
 
   function getData() {
-    api.getPosts(0);
+    api.getPosts(0)
+    .then(res => {
+      console.log(res.response);
+      setPosts(res.response.items);
+    })
+    .finally(() => console.log(posts))
   }
 
   return (
     <div className='widget widget_size_small' onScroll={handleScroll} onClick={getData}>
-      <div className='post'>
-        <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Harum repellat nihil corporis dicta commodi, soluta blanditiis rerum, consequuntur inventore delectus ipsum rem eligendi, velit neque ipsam earum nostrum architecto voluptatibus?</p>
-        <img src="https://images.unsplash.com/photo-1700629691463-3d8a9294a80c?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" alt="" />
-      </div>
-      <div className='post'>
-        <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Harum repellat nihil corporis dicta commodi, soluta blanditiis rerum, consequuntur inventore delectus ipsum rem eligendi, velit neque ipsam earum nostrum architecto voluptatibus?</p>
-        <img src="https://images.unsplash.com/photo-1700629691463-3d8a9294a80c?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" alt="" />
-      </div>
-      <div className='post'>
-        <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Harum repellat nihil corporis dicta commodi, soluta blanditiis rerum, consequuntur inventore delectus ipsum rem eligendi, velit neque ipsam earum nostrum architecto voluptatibus?</p>
-        <img src="https://images.unsplash.com/photo-1700629691463-3d8a9294a80c?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" alt="" />
-      </div>
-      <div className='post'>
-        <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Harum repellat nihil corporis dicta commodi, soluta blanditiis rerum, consequuntur inventore delectus ipsum rem eligendi, velit neque ipsam earum nostrum architecto voluptatibus?</p>
-        <img src="https://images.unsplash.com/photo-1700629691463-3d8a9294a80c?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" alt="" />
-      </div>
-      <div className='post'>
-        <p>Lorem ipsum dolor sit amet, consectetur adipisicing elit. Harum repellat nihil corporis dicta commodi, soluta blanditiis rerum, consequuntur inventore delectus ipsum rem eligendi, velit neque ipsam earum nostrum architecto voluptatibus?</p>
-        <img src="https://images.unsplash.com/photo-1700629691463-3d8a9294a80c?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D" alt="" />
-      </div>
+      {
+        posts.length && posts.map(post => {
+          return (
+            <div className="post" key={post.id}>
+              {
+                post.text && <p className='post__text'>
+                  {post.text}
+                </p>
+              }
+              {
+                post.attachments.length && post.attachments[0].photo ? <img src={post.attachments[0].photo.sizes[1].url} alt="" /> : null
+              }
+              <div className="post__advanced-data">
+                <div className="post__items-count">
+                  <img className='post__icon' src={likeImg} alt="" />
+                  <p className="count">
+                    {post.likes.count}
+                  </p>
+                </div>
+                <div className="post__items-count">
+                  <img className='post__icon' src={repostImg} alt="" />
+                  <p className="count">
+                    {post.reposts.count}
+                  </p>
+                </div>
+                <div className="post__items-count">
+                  <img className='post__icon' src={viewImg} alt="" />
+                  <p className="count">
+                    {post.views.count}
+                  </p>
+                </div>
+                <div className="post__items-count">
+                  <img className='post__icon' src={dateImg} alt="" />
+                  <p className="count">
+                    {transformDate(post.date)}
+                  </p>
+                </div>
+              </div>
+            </div>
+          )
+        })
+      }
     </div>
   )
 }
